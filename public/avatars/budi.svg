@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="budiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="20" fill="url(#budiGrad)" />
+  <!-- Traditional Chef/Food Cloche Icon -->
+  <path d="M 30,75 H 70 V 78 H 30 Z" fill="#94a3b8" />
+  <path d="M 35,74 A 15,15 0 0 1 65,74 Z" fill="#cbd5e1" />
+  <circle cx="50" cy="56" r="3.5" fill="#cbd5e1" />
+  <!-- Face Outline -->
+  <circle cx="50" cy="40" r="18" fill="#ffedd5" />
+  <!-- Sceptical / Stern Face -->
+  <rect x="42" y="38" width="5" height="2" rx="1" fill="#0f172a" />
+  <rect x="53" y="38" width="5" height="2" rx="1" fill="#0f172a" />
+  <path d="M 45,46 H 55" stroke="#0f172a" stroke-width="2" stroke-linecap="round" />
+  <!-- Mustache -->
+  <path d="M 43,45 Q 50,42 57,45" stroke="#1e293b" stroke-width="3" stroke-linecap="round" fill="none" />
+</svg>
