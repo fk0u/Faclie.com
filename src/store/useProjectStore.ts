@@ -20,7 +20,7 @@ interface ProjectState {
   resetProject: (clientId: string) => void;
 }
 
-const INITIAL_BRIEFS: Record<string, Omit<ProjectBrief, 'id'>> = {
+export const INITIAL_BRIEFS: Record<string, Omit<ProjectBrief, 'id'>> = {
   linda_chen: {
     title: 'TechFlow SaaS Landing Page & Core UI',
     companyName: 'TechFlow SaaS',

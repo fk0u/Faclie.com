@@ -74,7 +74,16 @@ function createWindow() {
     autoHideMenuBar: true,
   });
 
-  mainWindow.loadURL(`http://localhost:${PORT}`);
+  const dns = require('dns');
+  dns.lookup('Faclie.space', (err, address) => {
+    if (err || !address) {
+      console.log('Faclie.space is not resolved. Falling back to localhost.');
+      mainWindow.loadURL(`http://localhost:${PORT}`);
+    } else {
+      console.log(`Faclie.space resolved to ${address}. Loading via local domain.`);
+      mainWindow.loadURL(`http://Faclie.space:${PORT}`);
+    }
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;

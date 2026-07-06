@@ -5,12 +5,13 @@
   "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "desktop:dev": "electron .",
-    "desktop:pack": "electron-builder --dir",
-    "desktop:build": "npm run build && electron-builder"
+    "desktop:pack": "electron-packager . Faclie --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"(docs|dist|\\.git|\\.next/cache)\"",
+    "desktop:build": "npm run build && electron-packager . Faclie --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"(docs|dist|\\.git|\\.next/cache)\"",
+    "desktop:zip": "tar -a -c -f dist/Faclie-Portable.zip -C dist/Faclie-win32-x64 ."
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.2",
@@ -34,6 +35,7 @@
     "@types/react-dom": "^19",
     "electron": "^33.0.0",
     "electron-builder": "^24.13.3",
+    "electron-packager": "^17.1.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
