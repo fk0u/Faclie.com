@@ -21,9 +21,13 @@ function startNextServer() {
     console.log('Spawning background Next.js production server...');
     const nextBin = path.join(app.getAppPath(), 'node_modules', 'next', 'dist', 'bin', 'next');
     
-    nextProcess = spawn('node', [nextBin, 'start', '-p', PORT.toString()], {
+    nextProcess = spawn(process.execPath, [nextBin, 'start', '-p', PORT.toString()], {
       cwd: app.getAppPath(),
-      env: { ...process.env, NODE_ENV: 'production' }
+      env: { 
+        ...process.env, 
+        NODE_ENV: 'production',
+        ELECTRON_RUN_AS_NODE: '1'
+      }
     });
 
     nextProcess.stdout.on('data', (data) => {
