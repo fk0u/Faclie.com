@@ -1,12 +1,16 @@
 {
   "name": "faclie",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "desktop:dev": "electron .",
+    "desktop:pack": "electron-builder --dir",
+    "desktop:build": "npm run build && electron-builder"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.2",
@@ -28,9 +32,43 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "electron": "^33.0.0",
+    "electron-builder": "^24.13.3",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "build": {
+    "appId": "com.faclie.simulator",
+    "productName": "Faclie",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!docs/**/*",
+      "!dist/**/*",
+      "!.git/**/*",
+      "!.next/cache/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
   }
 }

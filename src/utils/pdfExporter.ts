@@ -2,7 +2,17 @@ import { jsPDF } from 'jspdf';
 import { ChatMessage } from '@/types/chat';
 import { ActiveClientState } from '@/types/client';
 
-export const exportChatToPDF = (client: ActiveClientState, messages: ChatMessage[]) => {
+export const exportChatToPDF = (
+  client: ActiveClientState,
+  messages: ChatMessage[],
+  scoreCard?: {
+    professionalism: number;
+    scopeManagement: number;
+    negotiationSkill: number;
+    overallRating: number;
+    feedbackText: string;
+  }
+) => {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -50,14 +60,90 @@ export const exportChatToPDF = (client: ActiveClientState, messages: ChatMessage
   doc.text(`Active Pipeline:     ${client.projectPipelineStage.toUpperCase()}`, margin + 90, 58);
   doc.text(`Active Emotional:    ${client.currentState.activeMood.toUpperCase()}`, margin + 90, 64);
   
-  // Conversation section header
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
-  doc.setTextColor(99, 102, 241);
-  doc.text('CONVERSATION HISTORY', margin, 86);
-  doc.line(margin, 89, docWidth - margin, 89);
-  
+  // Rapor Penilaian (Scorecard) rendering
   let yPosition = 96;
+  
+  if (scoreCard) {
+    const scoreY = 78;
+    const scoreHeight = 54;
+    
+    // Light gray card background with thin border
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(226, 232, 240);
+    doc.roundedRect(margin, scoreY, contentWidth, scoreHeight, 3, 3, 'FD');
+    
+    // Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(99, 102, 241); // Indigo color
+    doc.text('PERFORMANCE EVALUATION REPORT', margin + 5, scoreY + 6);
+    
+    // Rank/Grade Title
+    const getRankName = (score: number) => {
+      if (score >= 90) return 'Elite Freelance Consultant';
+      if (score >= 75) return 'Professional Contractor';
+      if (score >= 50) return 'Midweight Agency Lead';
+      return 'Junior Spec Builder';
+    };
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text(`Overall Rating: ${scoreCard.overallRating}% - ${getRankName(scoreCard.overallRating)}`, margin + 5, scoreY + 12);
+    
+    // Progress Bars: Column 1
+    const drawProgressBar = (label: string, value: number, x: number, y: number, color: [number, number, number]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105); // Slate-600
+      doc.text(`${label}: ${value}%`, x, y);
+      
+      // Track (Background bar)
+      doc.setFillColor(226, 232, 240);
+      doc.rect(x, y + 2, 70, 2, 'F');
+      
+      // Fill (Colored indicator bar)
+      doc.setFillColor(...color);
+      doc.rect(x, y + 2, (value / 100) * 70, 2, 'F');
+    };
+    
+    drawProgressBar('Professionalism', scoreCard.professionalism, margin + 5, scoreY + 18, [99, 102, 241]); // Indigo
+    drawProgressBar('Scope Management', scoreCard.scopeManagement, margin + 5, scoreY + 28, [245, 158, 11]); // Amber
+    drawProgressBar('Negotiation Skill', scoreCard.negotiationSkill, margin + 5, scoreY + 38, [16, 185, 129]); // Emerald
+    
+    // Feedback column
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(15, 23, 42);
+    doc.text('Evaluation Feedback:', margin + 85, scoreY + 12);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(51, 65, 85);
+    const feedbackLines = doc.splitTextToSize(scoreCard.feedbackText, contentWidth - 90);
+    doc.text(feedbackLines, margin + 85, scoreY + 17);
+    
+    // Set layout starting position for conversation
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(99, 102, 241);
+    doc.text('CONVERSATION HISTORY', margin, scoreY + scoreHeight + 10);
+    doc.setDrawColor(226, 232, 240);
+    doc.line(margin, scoreY + scoreHeight + 13, docWidth - margin, scoreY + scoreHeight + 13);
+    
+    yPosition = scoreY + scoreHeight + 20;
+  } else {
+    // Original placement if no scorecard
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(99, 102, 241);
+    doc.text('CONVERSATION HISTORY', margin, 86);
+    doc.setDrawColor(226, 232, 240);
+    doc.line(margin, 89, docWidth - margin, 89);
+    
+    yPosition = 96;
+  }
+  
   doc.setFontSize(9.5);
   
   messages.forEach((msg) => {

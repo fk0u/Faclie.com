@@ -17,13 +17,21 @@ export const handleUserMessage = async (clientId: string, text: string) => {
 
   const brief = projectStore.briefs[clientId];
 
+  // Sanitize user text input to prevent XSS / HTML injections
+  const sanitizedText = text
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .trim();
+
+  if (!sanitizedText) return;
+
   // 1. Detect user intent
-  const intent = parseUserIntent(text);
+  const intent = parseUserIntent(sanitizedText);
 
   // 2. Add user message to chat history
   chatStore.addMessage(clientId, {
     sender: 'user',
-    text,
+    text: sanitizedText,
     detectedIntent: intent,
   });
 
@@ -50,7 +58,7 @@ export const handleUserMessage = async (clientId: string, text: string) => {
       body: JSON.stringify({
         clientId,
         userIntent: intent,
-        userMessage: text,
+        userMessage: sanitizedText,
         clientState: client,
         brief,
         history: chatStore.sessions[clientId]?.messages || []
@@ -60,12 +68,12 @@ export const handleUserMessage = async (clientId: string, text: string) => {
     result = await response.json();
   } catch (err) {
     console.warn('API error, falling back to offline dialogue tree:', err);
-    result = generateClientResponse(clientId, intent, text, client, brief);
+    result = generateClientResponse(clientId, intent, sanitizedText, client, brief);
   }
 
   // Fallback guards
   if (!result || !result.reply) {
-    result = generateClientResponse(clientId, intent, text, client, brief);
+    result = generateClientResponse(clientId, intent, sanitizedText, client, brief);
   }
   if (!result.emotionalShift) {
     result.emotionalShift = { satisfaction: 0, patience: 0, urgency: 0 };

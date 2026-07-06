@@ -122,7 +122,7 @@ export const ChatWindow = ({ client }: ChatWindowProps) => {
   };
 
   const handleExportPDF = () => {
-    exportChatToPDF(client, session.messages);
+    exportChatToPDF(client, session.messages, session.scoreCard);
   };
 
   // Helper for rendering meter percentages
