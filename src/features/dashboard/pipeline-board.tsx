@@ -88,7 +88,6 @@ export const PipelineBoard = ({ clients }: PipelineBoardProps) => {
                 </div>
               ) : (
                 colClients.map((client) => {
-                  const initials = client.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
                   const healthColor = client.healthScore > 70 
                     ? 'border-emerald-500/20 text-emerald-500 bg-emerald-500/5' 
                     : client.healthScore > 40

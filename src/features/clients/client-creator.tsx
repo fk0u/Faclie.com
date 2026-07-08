@@ -266,6 +266,18 @@ export const ClientCreator = ({ isOpen, onClose }: ClientCreatorProps) => {
                 className="w-full accent-primary h-1 rounded-lg bg-border cursor-pointer"
               />
             </div>
+            {/* Extraversion */}
+            <div className="space-y-1">
+              <div className="flex justify-between">
+                <span>Extraversion</span>
+                <span className="text-foreground">{extraversion}</span>
+              </div>
+              <input
+                type="range" min="0" max="100" value={extraversion}
+                onChange={(e) => setExtraversion(Number(e.target.value))}
+                className="w-full accent-primary h-1 rounded-lg bg-border cursor-pointer"
+              />
+            </div>
           </div>
         </div>
 

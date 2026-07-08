@@ -12,14 +12,10 @@ import Navbar from '@/components/shared/navbar';
 import { 
   TrendingUp, 
   Award, 
-  RotateCcw, 
   Play, 
-  MessageSquare,
   BookOpen,
   ArrowRight,
-  ShieldCheck,
-  ChevronRight,
-  Users
+  ShieldCheck
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/utils/tailwind';

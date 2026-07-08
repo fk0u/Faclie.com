@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { ActiveClientState } from '@/types/client';
-import { ChatSession, ChatMessage } from '@/types/chat';
 import { useChatStore } from '@/store/useChatStore';
 import { useClientStore } from '@/store/useClientStore';
 import { useProjectStore } from '@/store/useProjectStore';
@@ -19,9 +18,7 @@ import {
   Volume2, 
   Download, 
   Sparkles, 
-  AlertTriangle,
-  RotateCcw,
-  Play
+  AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/utils/tailwind';
 import Link from 'next/link';

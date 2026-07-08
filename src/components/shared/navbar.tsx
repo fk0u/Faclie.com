@@ -3,12 +3,20 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sun, Moon, Sparkles, LayoutDashboard, BarChart2 } from 'lucide-react';
+import { Sun, Moon, LayoutDashboard, BarChart2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const Navbar = () => {
   const pathname = usePathname();
   const [theme, setTheme] = React.useState<'light' | 'dark'>('dark');
+  const [aiConfig, setAiConfig] = React.useState<{ online: boolean; provider: string; model: string } | null>(null);
+
+  React.useEffect(() => {
+    fetch('/api/config')
+      .then((res) => res.json())
+      .then((data) => setAiConfig(data))
+      .catch((err) => console.warn('Failed to fetch AI configuration status:', err));
+  }, []);
 
   // Initialize theme from HTML class list
   React.useEffect(() => {
@@ -77,6 +85,30 @@ export const Navbar = () => {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
+          {/* AI Connection Status HUD */}
+          {aiConfig && (
+            <div 
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold select-none cursor-help mr-2 transition-all ${
+                aiConfig.online 
+                  ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-500 hover:bg-emerald-500/15' 
+                  : 'bg-amber-500/10 border-amber-500/25 text-amber-500 hover:bg-amber-500/15'
+              }`}
+              title={
+                aiConfig.online 
+                  ? `AI model active: ${aiConfig.model} (${aiConfig.provider.toUpperCase()} Provider)` 
+                  : 'Running in Local Offline Mode. Set NVIDIA_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY, or GROQ_API_KEY to enable Generative AI.'
+              }
+            >
+              <div className={`h-1.5 w-1.5 rounded-full ${aiConfig.online ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+              <span className="hidden sm:inline">
+                {aiConfig.online ? `AI: ${aiConfig.provider.toUpperCase()}` : 'Local Mode'}
+              </span>
+              <span className="sm:hidden">
+                {aiConfig.online ? aiConfig.provider.toUpperCase() : 'Local'}
+              </span>
+            </div>
+          )}
+
           {/* Mobile Nav Trigger Links */}
           <div className="flex md:hidden gap-1 mr-2">
             {navLinks.map((link) => {

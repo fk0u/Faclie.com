@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { ActiveClientState } from '@/types/client';
-import { ProjectBrief, Milestone } from '@/types/project';
+import { Milestone } from '@/types/project';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -15,7 +15,6 @@ import {
   Calendar, 
   AlertTriangle, 
   CheckCircle, 
-  Clock,
   Sparkles,
   FileCode,
   User,

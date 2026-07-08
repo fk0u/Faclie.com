@@ -4,7 +4,6 @@ import { useClientStore } from '@/store/useClientStore';
 import { useChatStore } from '@/store/useChatStore';
 import { useProjectStore } from '@/store/useProjectStore';
 import { ActiveClientState } from '@/types/client';
-import { ProjectBrief } from '@/types/project';
 import { audioService } from '@/utils/audioService';
 
 export const handleUserMessage = async (clientId: string, text: string) => {
@@ -68,12 +67,12 @@ export const handleUserMessage = async (clientId: string, text: string) => {
     result = await response.json();
   } catch (err) {
     console.warn('API error, falling back to offline dialogue tree:', err);
-    result = generateClientResponse(clientId, intent, sanitizedText, client, brief);
+    result = generateClientResponse(clientId, intent, sanitizedText, client);
   }
 
   // Fallback guards
   if (!result || !result.reply) {
-    result = generateClientResponse(clientId, intent, sanitizedText, client, brief);
+    result = generateClientResponse(clientId, intent, sanitizedText, client);
   }
   if (!result.emotionalShift) {
     result.emotionalShift = { satisfaction: 0, patience: 0, urgency: 0 };
@@ -105,7 +104,7 @@ export const handleUserMessage = async (clientId: string, text: string) => {
     }
 
     // Add client reply
-    const clientMessage = chatStore.addMessage(clientId, {
+    chatStore.addMessage(clientId, {
       sender: 'client',
       text: result.reply,
       isVoiceNote: Math.random() < style.imperfections.voiceNoteChance && client.currentState.activeMood === 'furious',
@@ -191,7 +190,7 @@ export const handleUserMessage = async (clientId: string, text: string) => {
     // 11. Evaluate Scorecard if final completed stage reached
     const freshClient = useClientStore.getState().clients.find((c) => c.id === clientId);
     if (freshClient?.projectPipelineStage === 'completed') {
-      const evaluation = evaluateFreelancerPerformance(clientId, freshClient, projectStore.briefs[clientId]);
+      const evaluation = evaluateFreelancerPerformance(clientId, freshClient);
       chatStore.setScoreCard(clientId, evaluation);
       if (chatStore.soundEnabled) {
         audioService.playSuccess();
@@ -204,8 +203,7 @@ export const handleUserMessage = async (clientId: string, text: string) => {
 // Custom grading script based on client state and memory keys
 const evaluateFreelancerPerformance = (
   clientId: string,
-  client: ActiveClientState,
-  brief?: ProjectBrief
+  client: ActiveClientState
 ) => {
   let professionalism = 85;
   let scopeManagement = 75;

@@ -1,6 +1,5 @@
 import { ActiveClientState } from '@/types/client';
 import { UserIntent } from '@/types/chat';
-import { ProjectBrief } from '@/types/project';
 
 interface ResponseResult {
   reply: string;
@@ -45,12 +44,10 @@ export const generateClientResponse = (
   clientId: string,
   userIntentParam: UserIntent,
   userMessage: string,
-  clientState: ActiveClientState,
-  brief?: ProjectBrief
+  clientState: ActiveClientState
 ): ResponseResult => {
   const userIntent = userIntentParam as string;
   const stage = clientState.projectPipelineStage;
-  const mood = clientState.currentState.activeMood;
   const memory = clientState.memory;
 
   // Typo Injector Helper based on Typo Chance

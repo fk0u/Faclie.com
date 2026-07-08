@@ -16,7 +16,7 @@ interface ChatState {
 
 export const useChatStore = create<ChatState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       sessions: {},
       activeReplaySessionId: null,
       soundEnabled: true,

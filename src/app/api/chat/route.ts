@@ -4,11 +4,44 @@ import { ChatMessage } from '@/types/chat';
 import { ActiveClientState } from '@/types/client';
 import { ProjectBrief } from '@/types/project';
 
-const apiKey = process.env.NVIDIA_API_KEY;
+// Detect active LLM provider and settings based on available environment keys
+const provider = process.env.LLM_PROVIDER || 
+  (process.env.NVIDIA_API_KEY ? 'nvidia' : 
+   process.env.OPENAI_API_KEY ? 'openai' : 
+   process.env.GEMINI_API_KEY ? 'gemini' : 
+   process.env.GROQ_API_KEY ? 'groq' : 
+   process.env.LLM_API_KEY ? 'custom' : 'none');
+
+let apiKey = '';
+let baseURL = '';
+let defaultModel = '';
+
+if (provider === 'nvidia') {
+  apiKey = process.env.NVIDIA_API_KEY || '';
+  baseURL = process.env.LLM_BASE_URL || 'https://integrate.api.nvidia.com/v1';
+  defaultModel = process.env.LLM_MODEL || 'stepfun-ai/step-3.5-flash';
+} else if (provider === 'openai') {
+  apiKey = process.env.OPENAI_API_KEY || '';
+  baseURL = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
+  defaultModel = process.env.LLM_MODEL || 'gpt-4o-mini';
+} else if (provider === 'gemini') {
+  apiKey = process.env.GEMINI_API_KEY || '';
+  baseURL = process.env.LLM_BASE_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/';
+  defaultModel = process.env.LLM_MODEL || 'gemini-1.5-flash';
+} else if (provider === 'groq') {
+  apiKey = process.env.GROQ_API_KEY || '';
+  baseURL = process.env.LLM_BASE_URL || 'https://api.groq.com/openai/v1';
+  defaultModel = process.env.LLM_MODEL || 'llama-3.3-70b-versatile';
+} else {
+  // Custom or fallback
+  apiKey = process.env.LLM_API_KEY || '';
+  baseURL = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
+  defaultModel = process.env.LLM_MODEL || 'gpt-4o-mini';
+}
 
 const openai = new OpenAI({
   apiKey: apiKey || 'dummy-key-to-prevent-openai-init-crash',
-  baseURL: 'https://integrate.api.nvidia.com/v1',
+  baseURL: baseURL || undefined,
 });
 // In-Memory IP Rate Limiting Store
 interface RateLimitBucket {
@@ -52,7 +85,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!apiKey) {
-      return NextResponse.json({ error: 'NVIDIA_API_KEY is not configured on the server. Falling back to offline tree.' }, { status: 400 });
+      return NextResponse.json({ error: 'API key is not configured on the server. Falling back to offline tree.' }, { status: 400 });
     }
 
     // 2. Payload Extraction & JSON Parsing Safeguards
@@ -198,17 +231,33 @@ You must respond in JSON format ONLY matching the schema. Do not prefix or suffi
   "riskTriggered": {} // optional
 }`;
 
-    const completion = await openai.chat.completions.create({
-      model: "stepfun-ai/step-3.5-flash",
-      messages: [
-        { role: "system" as const, content: systemPrompt },
-        ...chatHistory,
-        { role: "user" as const, content: sanitizedUserMessage }
-      ],
-      temperature: 0.75,
-      top_p: 0.9,
-      response_format: { type: "json_object" }
-    });
+    let completion;
+    try {
+      completion = await openai.chat.completions.create({
+        model: defaultModel,
+        messages: [
+          { role: "system" as const, content: systemPrompt },
+          ...chatHistory,
+          { role: "user" as const, content: sanitizedUserMessage }
+        ],
+        temperature: 0.75,
+        top_p: 0.9,
+        response_format: { type: "json_object" }
+      });
+    } catch (apiError) {
+      console.warn("Retrying chat completion without response_format due to error:", apiError);
+      // Fallback: try without JSON response format in case model does not support it
+      completion = await openai.chat.completions.create({
+        model: defaultModel,
+        messages: [
+          { role: "system" as const, content: systemPrompt },
+          ...chatHistory,
+          { role: "user" as const, content: sanitizedUserMessage }
+        ],
+        temperature: 0.75,
+        top_p: 0.9
+      });
+    }
 
     const message = completion.choices[0]?.message as unknown as {
       content?: string | null;

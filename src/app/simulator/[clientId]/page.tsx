@@ -8,7 +8,7 @@ import { useChatStore } from '@/store/useChatStore';
 import { ChatWindow } from '@/features/chat/chat-window';
 import { ProjectBriefPanel } from '@/features/project/project-brief-panel';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, RotateCcw, AlertTriangle, Play, HelpCircle } from 'lucide-react';
+import { ChevronLeft, RotateCcw, AlertTriangle } from 'lucide-react';
 import Navbar from '@/components/shared/navbar';
 import Link from 'next/link';
 

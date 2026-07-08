@@ -8,10 +8,7 @@ import {
   ArrowRight, 
   MessageSquare, 
   ShieldAlert, 
-  TrendingUp, 
-  Lock,
-  Ghost,
-  Volume2
+  TrendingUp
 } from 'lucide-react';
 
 export default function Home() {
